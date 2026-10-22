@@ -1,0 +1,54 @@
+<!-- Trimmed Junos RPC replies for one lab router, in the shape PyEZ returns them -->
+<lab>
+<software-information><host-name>r1</host-name><product-model>vmx</product-model><junos-version>23.2R1.14</junos-version></software-information>
+<chassis-inventory><chassis><name>Chassis</name><serial-number>VM65A1B2C3</serial-number><description>VMX</description>
+  <chassis-module><name>Routing Engine 0</name><description>RE-VMX</description></chassis-module>
+  <chassis-module><name>FPC 0</name><part-number>BUILTIN</part-number><serial-number>BUILTIN</serial-number><description>Virtual FPC</description></chassis-module>
+</chassis></chassis-inventory>
+<interface-information terse="1">
+  <physical-interface><name>ge-0/0/0</name><admin-status>up</admin-status><oper-status>up</oper-status>
+    <logical-interface><name>ge-0/0/0.0</name><admin-status>up</admin-status><oper-status>up</oper-status></logical-interface></physical-interface>
+  <physical-interface><name>ge-0/0/1</name><admin-status>up</admin-status><oper-status>down</oper-status></physical-interface>
+  <physical-interface><name>lo0</name><admin-status>up</admin-status><oper-status>up</oper-status></physical-interface>
+</interface-information>
+<interface-information descriptions="1">
+  <physical-interface><name>ge-0/0/0</name><admin-status>up</admin-status><oper-status>up</oper-status><description>CORE | r2 ge-0/0/0</description></physical-interface>
+  <physical-interface><name>ge-0/0/1</name><admin-status>up</admin-status><oper-status>down</oper-status><description>TRANSIT | Tidegate Transit AS64496 | CID TDG-LAB-0001</description></physical-interface>
+</interface-information>
+<bgp-information>
+  <bgp-peer><peer-address>192.0.2.1</peer-address><peer-as>64496</peer-as><peer-state>Idle</peer-state><flap-count>1</flap-count>
+    <description>Tidegate Transit TDG-LAB-0001</description></bgp-peer>
+  <bgp-peer><peer-address>10.255.0.2</peer-address><peer-as>64510</peer-as><peer-state>Established</peer-state><flap-count>0</flap-count>
+    <bgp-rib><name>inet.0</name><received-prefix-count>12</received-prefix-count></bgp-rib></bgp-peer>
+</bgp-information>
+<ospf-neighbor-information>
+  <ospf-neighbor><neighbor-address>10.0.0.1</neighbor-address><interface-name>ge-0/0/0.0</interface-name>
+    <ospf-neighbor-state>Full</ospf-neighbor-state><neighbor-id>10.255.0.2</neighbor-id></ospf-neighbor>
+</ospf-neighbor-information>
+<alarm-information xmlns:junos="http://xml.juniper.net/junos/23.2R1/junos">
+  <alarm-detail><alarm-time junos:seconds="1792000000">2026-10-14 09:46:40 UTC</alarm-time><alarm-class>Major</alarm-class>
+    <alarm-description>PEM 1 Not OK</alarm-description></alarm-detail>
+</alarm-information>
+<lldp-neighbors-information>
+  <lldp-neighbor-information><lldp-local-port-id>ge-0/0/0</lldp-local-port-id><lldp-remote-chassis-id>2c:6b:f5:00:00:02</lldp-remote-chassis-id>
+    <lldp-remote-port-id>526</lldp-remote-port-id><lldp-remote-port-description>ge-0/0/0</lldp-remote-port-description>
+    <lldp-remote-system-name>r2</lldp-remote-system-name></lldp-neighbor-information>
+</lldp-neighbors-information>
+<route-engine-information><route-engine><cpu-idle>91</cpu-idle><memory-buffer-utilization>38</memory-buffer-utilization></route-engine></route-engine-information>
+<configuration-set>
+set system host-name r1
+set system services ssh root-login deny
+set system services netconf ssh
+set interfaces ge-0/0/0 description "CORE | r2 ge-0/0/0"
+set interfaces ge-0/0/0 unit 0 family inet address 10.0.0.0/31
+set interfaces ge-0/0/1 description "TRANSIT | Tidegate Transit AS64496 | CID TDG-LAB-0001"
+set interfaces ge-0/0/1 unit 0 family inet address 192.0.2.2/30
+set interfaces lo0 unit 0 family inet address 10.255.0.1/32
+set routing-options autonomous-system 64510
+set protocols bgp group TRANSIT-TIDEGATE type external
+set protocols bgp group TRANSIT-TIDEGATE neighbor 192.0.2.1 peer-as 64496
+set protocols bgp group IBGP type internal
+set protocols bgp group IBGP neighbor 10.255.0.2
+set protocols ospf area 0.0.0.0 interface ge-0/0/0.0
+</configuration-set>
+</lab>

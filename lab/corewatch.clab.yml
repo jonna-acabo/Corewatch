@@ -1,0 +1,21 @@
+# Two-router Junos lab for CoreWatch live mode.
+# Needs: Linux host with KVM, containerlab, and a vJunos-router image built with vrnetlab
+# (the image is a free download from Juniper's vJunos labs page). See lab/README.md.
+name: corewatch
+
+topology:
+  kinds:
+    juniper_vjunosrouter:
+      image: vrnetlab/juniper_vjunos-router:23.2R1.15   # use the tag you built
+  nodes:
+    r1:
+      kind: juniper_vjunosrouter
+      startup-config: r1.cfg
+      mgmt-ipv4: 172.20.20.2
+    r2:
+      kind: juniper_vjunosrouter
+      startup-config: r2.cfg
+      mgmt-ipv4: 172.20.20.3
+  links:
+    # eth1 = ge-0/0/0 inside the router
+    - endpoints: ["r1:eth1", "r2:eth1"]

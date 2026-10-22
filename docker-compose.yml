@@ -1,0 +1,41 @@
+services:
+  corewatch:
+    build: .
+    image: corewatch:local
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      SIM_ENABLED: "true"
+      SIM_INTERVAL_SECONDS: "15"
+      ESCALATION_MINUTE_SECONDS: "${ESCALATION_MINUTE_SECONDS:-60}"
+      # Optional: LLM analysis. Put the key in .env (git-ignored), never in this file.
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
+      AI_MODEL: "${AI_MODEL:-claude-sonnet-4-5}"
+      # Optional: real Slack alerts (Incoming Webhook URL)
+      SLACK_WEBHOOK_URL: "${SLACK_WEBHOOK_URL:-}"
+      SLACK_CHANNEL: "${SLACK_CHANNEL:-#noc-core}"
+    restart: unless-stopped
+
+  # `docker compose --profile monitoring up`: Prometheus scrapes /metrics, Grafana shows a ready-made dashboard
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    profiles: ["monitoring"]
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "127.0.0.1:9090:9090"
+    depends_on: [corewatch]
+
+  grafana:
+    image: grafana/grafana:11.3.1
+    profiles: ["monitoring"]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Viewer"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/corewatch.json
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on: [prometheus]

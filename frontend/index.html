@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CoreWatch · Junos NOC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l12 7v14l-12 7-12-7V9z' fill='%237c8cff'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%230b0f17'/%3E%3C/svg%3E">
+</head>
+<body>
+<aside class="side">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><path d="M16 2l12 7v14l-12 7-12-7V9z" fill="var(--accent)"/><circle cx="16" cy="16" r="5" fill="var(--bg)"/><circle cx="16" cy="16" r="2" fill="var(--accent)"/></svg>
+    <div><b>CoreWatch</b><small>Junos NOC</small></div>
+  </div>
+  <nav id="nav">
+    <a href="#overview" data-view="overview"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z"/></svg>Overview</a>
+    <a href="#incidents" data-view="incidents"><svg viewBox="0 0 24 24"><path d="M12 2L1 21h22zM11 9h2v6h-2zm0 8h2v2h-2z"/></svg>Incidents<span class="badge" id="nav-inc"></span></a>
+    <a href="#devices" data-view="devices"><svg viewBox="0 0 24 24"><path d="M2 5h20v6H2zm0 8h20v6H2zM5 7v2h2V7zm0 8v2h2v-2z"/></svg>Devices &amp; CLI</a>
+    <a href="#changes" data-view="changes"><svg viewBox="0 0 24 24"><path d="M4 4h12l4 4v12H4zm3 5v2h10V9zm0 4v2h10v-2zm0 4v2h6v-2z"/></svg>Changes<span class="badge soft" id="nav-chg"></span></a>
+    <a href="#audit" data-view="audit"><svg viewBox="0 0 24 24"><path d="M12 1l9 4v6c0 6-4 10-9 12-5-2-9-6-9-12V5zm-1 14l6-6-1.4-1.4L11 12.2 8.4 9.6 7 11z"/></svg>Audits</a>
+    <a href="#carriers" data-view="carriers"><svg viewBox="0 0 24 24"><path d="M6 19a5 5 0 01-.6-10A7 7 0 0119 8a5.5 5.5 0 01-.5 11z"/></svg>Carriers</a>
+    <a href="#oncall" data-view="oncall"><svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v4l2 3H5l2-3V7a5 5 0 015-5zm-2 16h4a2 2 0 01-4 0z"/></svg>On-call</a>
+  </nav>
+  <div class="side-foot">
+    <div id="mode-chip" class="chip">mock network</div>
+    <div id="ai-chip" class="chip">AI: offline writer</div>
+  </div>
+</aside>
+
+<main>
+  <header class="top">
+    <div class="crumbs" id="crumbs">Overview</div>
+    <div class="top-right">
+      <div class="oncall-mini" id="oncall-mini"></div>
+      <div class="clock" id="clock"></div>
+      <div class="sim">
+        <button class="btn ghost" id="sim-btn">Simulate fault ▾</button>
+        <div class="menu" id="sim-menu" hidden>
+          <button data-fault="transit_down">IP transit circuit down</button>
+          <button data-fault="ix_down">IX peering port down</button>
+          <button data-fault="circuit_errors">Carrier circuit errors (CRC)</button>
+          <button data-fault="bgp_down">eBGP down, link up</button>
+          <button data-fault="bgp_flap">BGP flapping</button>
+          <button data-fault="inter_dc_cut">Inter-DC dark fibre cut</button>
+          <button data-fault="pop_isolated">POP isolated (both circuits)</button>
+          <button data-fault="fpc_offline">FPC offline on core router</button>
+          <button data-fault="psu_fail">Power supply failure</button>
+          <button data-fault="fan_fail">Fan tray failure</button>
+          <button data-fault="cpu_high">Routing engine CPU high</button>
+          <button data-fault="optic_degrade">Optic degrading</button>
+          <button data-fault="device_down">Device down</button>
+          <button data-fault="mgmt_down">Management unreachable</button>
+          <button data-fault="unauthorized_commit">Unapproved config commit</button>
+          <hr>
+          <button data-fault="restore" class="ok">Restore everything</button>
+        </div>
+      </div>
+      <button class="btn icon" id="theme" title="Light / dark">◐</button>
+    </div>
+  </header>
+  <section id="view"></section>
+  <footer class="foot">Simulated network. All devices, carriers, circuit IDs, ASNs (documentation range), IP addresses, people and sites are fictional. Not affiliated with any vendor. AI analysis uses an LLM when an API key is configured, otherwise a built-in offline writer.</footer>
+</main>
+<div id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>

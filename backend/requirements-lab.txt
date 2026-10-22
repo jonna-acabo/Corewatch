@@ -1,0 +1,2 @@
+-r requirements.txt
+junos-eznc==2.7.4

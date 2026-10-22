@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+      - run: pip install -r requirements-dev.txt
+      - name: Lint
+        run: ruff check .
+      - name: Test
+        env:
+          SIM_ENABLED: "false"
+        run: pytest --cov=app --cov-report=term-missing
+
+  docker:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t corewatch:${{ github.sha }} .
+      - name: Smoke test container
+        run: |
+          docker run -d --name console -p 8000:8000 -e SIM_ENABLED=false corewatch:${{ github.sha }}
+          for i in $(seq 1 20); do curl -fsS localhost:8000/api/health && break; sleep 1; done
+          curl -fsS localhost:8000/api/incidents | python3 -c "import json,sys; assert len(json.load(sys.stdin)) >= 4"
+          curl -fsS localhost:8000/ | grep -q "CoreWatch"
+      - name: Push to GitHub Container Registry
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}
+          docker tag corewatch:${{ github.sha }} $IMAGE:latest
+          docker tag corewatch:${{ github.sha }} $IMAGE:${{ github.sha }}
+          docker push $IMAGE:latest
+          docker push $IMAGE:${{ github.sha }}

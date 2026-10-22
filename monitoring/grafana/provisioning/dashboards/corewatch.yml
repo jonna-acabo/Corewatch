@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: corewatch
+    folder: CoreWatch
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards
